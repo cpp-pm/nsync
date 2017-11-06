@@ -1,8 +1,8 @@
-cmake_minimum_required (VERSION 2.8.12)
+cmake_minimum_required (VERSION 3.0.0)
 
 # nsync provides portable synchronization primitives, such as mutexes and
 # condition variables.
-project (nsync)
+project (nsync VERSION 0.0.0)
 
 # Set variable NSYNC_LANGUAGE to "c++11" to build with C++11
 # rather than C.
@@ -276,10 +276,6 @@ foreach (t IN ITEMS ${NSYNC_TESTS})
 	add_test (NAME ${t} COMMAND ${t})
 endforeach (t)
 
-install (TARGETS nsync
-	LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
-	ARCHIVE DESTINATION lib COMPONENT Development)
-
 set (NSYNC_INCLUDES
 	"public/nsync.h"
 	"public/nsync_atomic.h"
@@ -296,6 +292,50 @@ set (NSYNC_INCLUDES
 	"public/nsync_waiter.h"
 )
 
+### Install ###
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+
+set(config_install_dir "lib/cmake/${PROJECT_NAME}")
+set(include_install_dir "include")
+
+set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+set(targets_export_name "${PROJECT_NAME}Targets")
+set(namespace "${PROJECT_NAME}::")
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${version_config}" COMPATIBILITY SameMajorVersion
+  )
+
+# Note: use 'targets_export_name'
+configure_package_config_file(
+  "${PROJECT_SOURCE_DIR}/cmake/Config.cmake.in"
+  "${project_config}"
+  INSTALL_DESTINATION "${config_install_dir}"
+  )
+
+install(
+  TARGETS ${PROJECT_NAME}
+  EXPORT "${targets_export_name}"
+  LIBRARY DESTINATION "lib"
+  ARCHIVE DESTINATION "lib"
+  RUNTIME DESTINATION "bin"
+  INCLUDES DESTINATION "${include_install_dir}"
+  )
+
 foreach (NSYNC_INCLUDE ${NSYNC_INCLUDES})
-	install (FILES ${NSYNC_INCLUDE} DESTINATION include COMPONENT Development)
+  # Note: headers are installed in a top level nsynch directories
+  install (FILES ${NSYNC_INCLUDE} DESTINATION "${include_install_dir}/nsync")
 endforeach ()
+
+install(
+  FILES "${project_config}" "${version_config}"
+  DESTINATION "${config_install_dir}"
+  )
+
+install(
+  EXPORT "${targets_export_name}"
+  NAMESPACE "${namespace}"
+  DESTINATION "${config_install_dir}"
+  )
