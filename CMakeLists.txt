@@ -28,6 +28,9 @@ set (NSYNC_POSIX_SRC
 # is false when ${CMAKE_C_COMPILER_ID} has the value "MSVC"!  See
 #    https://cmake.org/cmake/help/v3.1/policy/CMP0054.html
 
+message("NSYNC_LANGUAGE = ${NSYNC_LAGUAGE}")
+message("CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
+
 # Pick the include directory for the operating system.
 if ("${NSYNC_LANGUAGE}X" STREQUAL "c++11X")
 	include_directories ("${PROJECT_SOURCE_DIR}/platform/c++11")
@@ -100,7 +103,16 @@ if ("${NSYNC_LANGUAGE}X" STREQUAL "c++11X")
 		)
 		set (NSYNC_TEST_OS_SRC
 			"platform/posix/src/start_thread.c"
+        )
+    elseif ( "${CMAKE_SYSTEM_NAME}X" STREQUAL "AndroidX")
+		include_directories ("${PROJECT_SOURCE_DIR}/platform/posix")
+		add_compile_options ("-std=c++11")
+		set (NSYNC_OS_SRC
+			${NSYNC_OS_CPP_SRC}
 		)
+		set (NSYNC_TEST_OS_SRC
+			"platform/posix/src/start_thread.c"
+		)      
 	endif ()
 endif ()
 
@@ -155,6 +167,26 @@ if (NOT "${NSYNC_LANGUAGE}X" STREQUAL "c++11X")
 	elseif ("${CMAKE_SYSTEM_NAME}X" STREQUAL "OpenBSDX")
 		include_directories ("${PROJECT_SOURCE_DIR}/platform/openbsd")
 		set (NSYNC_POSIX ON)
+      elseif ( "${CMAKE_SYSTEM_NAME}X" STREQUAL "AndroidX")
+
+        message("ANDROID!!!")
+        
+      if ("${ANDROID_ARCH}X" STREQUAL "armv7-aX")
+		include_directories ("${PROJECT_SOURCE_DIR}/platform/arm")
+		set (NSYNC_POSIX ON)        
+      elseif ("${ANDROID_ARCH}X" STREQUAL "armv7-a-hardX")
+		include_directories ("${PROJECT_SOURCE_DIR}/platform/arm")
+		set (NSYNC_POSIX ON)        
+      elseif ("${ANDROID_ARCH}X" STREQUAL "arm64-v8aX")
+		include_directories ("${PROJECT_SOURCE_DIR}/platform/aarc64")
+		set (NSYNC_POSIX ON)                
+      elseif ("${ANDROID_ARCH}X" STREQUAL "x86X")
+		include_directories ("${PROJECT_SOURCE_DIR}/platform/x86_32")
+		set (NSYNC_POSIX ON)                        
+      elseif ("${ANDROID_ARCH}X" STREQUAL "x86_64X")
+		include_directories ("${PROJECT_SOURCE_DIR}/platform/x86_64")
+		set (NSYNC_POSIX ON)                                
+      endif()
 	endif ()
 endif ()
 
