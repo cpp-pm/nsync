@@ -28,9 +28,6 @@ set (NSYNC_POSIX_SRC
 # is false when ${CMAKE_C_COMPILER_ID} has the value "MSVC"!  See
 #    https://cmake.org/cmake/help/v3.1/policy/CMP0054.html
 
-message("NSYNC_LANGUAGE = ${NSYNC_LAGUAGE}")
-message("CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
-
 # Pick the include directory for the operating system.
 if ("${NSYNC_LANGUAGE}X" STREQUAL "c++11X")
 	include_directories ("${PROJECT_SOURCE_DIR}/platform/c++11")
